@@ -1,0 +1,53 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>รับข้อความ</title>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+  <style>
+    body { font-family: sans-serif; text-align: center; margin-top: 50px; }
+    input { padding: 10px; width: 80%; max-width: 300px; }
+    button { padding: 10px 20px; margin: 10px; }
+    #result { margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <h1>📥 รับข้อความ/ไฟล์</h1>
+  <input id="codeInput" placeholder="กรอกโค้ดที่ได้รับ">
+  <button onclick="getMessage()">ดึงข้อมูล</button>
+  <div id="result"></div>
+  <br><a href="index.html">⬅ กลับหน้าแรก</a>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyD-FakeKeyExample",
+      authDomain: "anon-share-demo.firebaseapp.com",
+      databaseURL: "https://anon-share-demo-default-rtdb.firebaseio.com",
+      projectId: "anon-share-demo",
+      storageBucket: "anon-share-demo.appspot.com",
+      messagingSenderId: "1234567890",
+      appId: "1:1234567890:web:abcdef123456"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    function getMessage() {
+      const code = document.getElementById("codeInput").value.trim().toUpperCase();
+      db.ref("messages/" + code).get().then(snapshot => {
+        if (snapshot.exists()) {
+          const data = snapshot.val();
+          let html = "";
+          if (data.message) html += `<p><strong>ข้อความ:</strong><br>${data.message}</p>`;
+          if (data.fileUrl) {
+            html += `<p><strong>ไฟล์:</strong><br><a href="${data.fileUrl}" target="_blank" download="${data.fileName}">${data.fileName}</a></p>`;
+          }
+          document.getElementById("result").innerHTML = html;
+        } else {
+          document.getElementById("result").innerText = "ไม่พบข้อมูลสำหรับโค้ดนี้";
+        }
+      });
+    }
+  </script>
+</body>
+</html>
